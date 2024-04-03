@@ -1,5 +1,6 @@
 from tkinter import Tk, Canvas, Button, PhotoImage, Label, messagebox
 from pathlib import Path
+import random
 
 class TicTacToeUI:
     def __init__(self, root):
@@ -37,10 +38,10 @@ class TicTacToeUI:
         self.create_game_buttons()
         self.create_score_texts()
         self.add_sidebar_buttons()
-
+        
         # Integrar la lógica del juego
         self.game_logic = GameLogic(self)
-
+        self.game_logic.player1_auto_play()
     def relative_to_assets(self, path: str) -> Path:
         current_folder = Path(__file__).parent
         assets_folder = current_folder / Path("assets")  # Modificado para relativo
@@ -108,10 +109,11 @@ class TicTacToeUI:
         place_cross_image.place(x=668.0, y=133.0, width=50.0, height=50.0)
 
     def reset_game(self):
-        self.game_logic.reset_game_logic()
+        self.game_logic.reset_game_logic()  # Resetea la lógica del juego
         for button in self.game_buttons:
-            button.config(image=self.empty_slot_image)
-        self.update_score_display()
+            button.config(image=self.empty_slot_image)  # Resetea las imágenes de los botones
+        self.update_score_display()  # Actualiza la visualización de los puntajes
+        self.game_logic.player1_auto_play()
 
     def update_score_display(self):
         self.game_canvas.itemconfig(self.player1_score_text, text=str(self.player1_score))
@@ -123,6 +125,13 @@ class GameLogic:
         self.current_player = "X"
         self.board = [""] * 9
 
+    def player1_auto_play(self):
+        # Seleccionar índices de posiciones vacías
+        empty_positions = [i for i, spot in enumerate(self.board) if spot == ""]
+        if empty_positions:
+            chosen_position = random.choice(empty_positions)  # Elegir una posición al azar
+            self.button_click(chosen_position)
+            
     def switch_player(self):
         self.current_player = "O" if self.current_player == "X" else "X"
 
@@ -151,7 +160,8 @@ class GameLogic:
                 self.ui.reset_game()
             else:
                 self.switch_player()
-
+                if self.current_player == "X":  # Suponiendo que "X" es el jugador automático
+                    self.player1_auto_play()
     def update_scores(self, winner):
         if winner == "X":
             self.ui.player1_score += 1
