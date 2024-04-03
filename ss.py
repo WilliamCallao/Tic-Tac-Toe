@@ -1,6 +1,5 @@
+from tkinter import Tk, Canvas, Button, PhotoImage, Label, messagebox
 from pathlib import Path
-from tkinter import Tk, Canvas, Button, PhotoImage
-from tkinter import Label
 
 class TicTacToeUI:
     def __init__(self, root):
@@ -8,21 +7,20 @@ class TicTacToeUI:
         self.main_window.geometry("800x550")
         self.main_window.configure(bg="black")
 
-        # Cargando imágenes para la interfaz de usuario
+        # Cargar imágenes para la interfaz de usuario
         self.bg_image = PhotoImage(file=self.relative_to_assets("bg_image.png"))
         self.cross_image = PhotoImage(file=self.relative_to_assets("cross_image.png"))
         self.circle_image = PhotoImage(file=self.relative_to_assets("circle_image.png"))
         self.empty_slot_image = PhotoImage(file=self.relative_to_assets("empty_slot_image.png"))
-
         self.restart_button_image = PhotoImage(file=self.relative_to_assets("restart_button_image.png"))
         self.circle_place_holder_image = PhotoImage(file=self.relative_to_assets("circle_place_holder_image.png"))
         self.cross_place_holder_image = PhotoImage(file=self.relative_to_assets("cross_place_holder_image.png"))
-        
-        # Inicializando puntuaciones
+
+        # Inicializar puntuaciones
         self.player1_score = 0
         self.player2_score = 0
-        
-        # Configurando el canvas
+
+        # Configurar el canvas
         self.game_canvas = Canvas(
             self.main_window,
             bg="black",
@@ -39,10 +37,13 @@ class TicTacToeUI:
         self.create_game_buttons()
         self.create_score_texts()
         self.add_sidebar_buttons()
-        
+
+        # Integrar la lógica del juego
+        self.game_logic = GameLogic(self)
+
     def relative_to_assets(self, path: str) -> Path:
         current_folder = Path(__file__).parent
-        assets_folder = current_folder / Path("D:/Proyectos/IA/assets")
+        assets_folder = current_folder / Path("assets")  # Modificado para relativo
         return assets_folder / Path(path)
 
     def create_game_buttons(self):
@@ -54,14 +55,12 @@ class TicTacToeUI:
         for position in positions:
             x, y = position
             game_button = Button(
-                image=self.empty_slot_image,
-                borderwidth=0,
-                highlightthickness=0,
-                relief="flat"
+                self.main_window, image=self.empty_slot_image, borderwidth=0,
+                highlightthickness=0, relief="flat",
+                command=lambda pos=position: self.game_logic.button_click(positions.index(pos))
             )
             game_button.place(x=x, y=y, width=80.0, height=80.0)
             self.game_buttons.append(game_button)
-            self.game_canvas.create_window(x, y, anchor="nw", window=game_button, width=80, height=80)
 
     def create_score_texts(self):
         self.game_canvas.create_text(
@@ -109,16 +108,64 @@ class TicTacToeUI:
         place_cross_image.place(x=668.0, y=133.0, width=50.0, height=50.0)
 
     def reset_game(self):
-        # Reiniciar el tablero
+        self.game_logic.reset_game_logic()
         for button in self.game_buttons:
             button.config(image=self.empty_slot_image)
+        self.update_score_display()
 
-        # Restablecer los puntajes
-        self.player1_score = 0
-        self.player2_score = 0
-
-        # Actualizar el texto de los puntajes en la interfaz
+    def update_score_display(self):
         self.game_canvas.itemconfig(self.player1_score_text, text=str(self.player1_score))
         self.game_canvas.itemconfig(self.player2_score_text, text=str(self.player2_score))
 
+class GameLogic:
+    def __init__(self, ui):
+        self.ui = ui
+        self.current_player = "X"
+        self.board = [""] * 9
 
+    def switch_player(self):
+        self.current_player = "O" if self.current_player == "X" else "X"
+
+    def check_winner(self):
+        win_conditions = [
+            (0, 1, 2), (3, 4, 5), (6, 7, 8),
+            (0, 3, 6), (1, 4, 7), (2, 5, 8),
+            (0, 4, 8), (2, 4, 6)
+        ]
+        for condition in win_conditions:
+            if self.board[condition[0]] and self.board[condition[0]] == self.board[condition[1]] == self.board[condition[2]]:
+                return self.board[condition[0]]
+        if "" not in self.board:
+            return "Empate"
+        return None
+
+    def button_click(self, i):
+        if self.board[i] == "" and self.check_winner() is None:
+            self.board[i] = self.current_player
+            image = self.ui.cross_image if self.current_player == "X" else self.ui.circle_image
+            self.ui.game_buttons[i].config(image=image)
+            winner = self.check_winner()
+            if winner:
+                messagebox.showinfo("Fin del Juego", f"¡El ganador es {winner}!" if winner != "Empate" else "¡Es un empate!")
+                self.update_scores(winner)
+                self.ui.reset_game()
+            else:
+                self.switch_player()
+
+    def update_scores(self, winner):
+        if winner == "X":
+            self.ui.player1_score += 1
+            self.ui.game_canvas.itemconfig(self.ui.player1_score_text, text=str(self.ui.player1_score))
+        elif winner == "O":
+            self.ui.player2_score += 1
+            self.ui.game_canvas.itemconfig(self.ui.player2_score_text, text=str(self.ui.player2_score))
+
+    def reset_game_logic(self):
+        self.board = [""] * 9
+        self.current_player = "X"
+
+if __name__ == "__main__":
+    window = Tk()
+    ui = TicTacToeUI(window)
+    window.resizable(False, False)
+    window.mainloop()
