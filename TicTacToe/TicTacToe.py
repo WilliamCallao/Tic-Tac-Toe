@@ -125,34 +125,37 @@ class GameLogic:
         self.current_player = "X"
         self.board = [""] * 9
 
+    def actions(self, board):
+        return [i for i, x in enumerate(board) if x == ""]
+    
     def player1_auto_play(self):
-        empty_positions = [i for i, spot in enumerate(self.board) if spot == ""]
-        if empty_positions:
-            chosen_position = random.choice(empty_positions)
-            self.button_click(chosen_position)
-            
+        if self.current_player == "X":
+            action = self.minmax_decision()
+            if action is not None:
+                self.button_click(action)      
+                      
     def switch_player(self):
         self.current_player = "O" if self.current_player == "X" else "X"
 
-    def check_winner(self):
+    def check_winner(self, board):
         win_conditions = [
             (0, 1, 2), (3, 4, 5), (6, 7, 8),
             (0, 3, 6), (1, 4, 7), (2, 5, 8),
             (0, 4, 8), (2, 4, 6)
         ]
         for condition in win_conditions:
-            if self.board[condition[0]] and self.board[condition[0]] == self.board[condition[1]] == self.board[condition[2]]:
-                return self.board[condition[0]]
-        if "" not in self.board:
+            if board[condition[0]] and board[condition[0]] == board[condition[1]] == board[condition[2]]:
+                return board[condition[0]]
+        if "" not in board:
             return "Empate"
         return None
 
     def button_click(self, i):
-        if self.board[i] == "" and self.check_winner() is None:
+        if self.board[i] == "" and self.check_winner(self.board) is None:
             self.board[i] = self.current_player
             image = self.ui.cross_image if self.current_player == "X" else self.ui.circle_image
             self.ui.game_buttons[i].config(image=image)
-            winner = self.check_winner()
+            winner = self.check_winner(self.board)
             if winner:
                 messagebox.showinfo("Fin del Juego", f"¡El ganador es {winner}!" if winner != "Empate" else "¡Es un empate!")
                 self.update_scores(winner)
@@ -174,6 +177,52 @@ class GameLogic:
         self.board = [""] * 9
         self.current_player = "X"
 
+    def result(self, board, action, player):
+        new_board = board[:]
+        new_board[action] = player
+        return new_board
+    
+    def utility(self, winner):
+        if winner == "X":
+            return 1
+        elif winner == "O":
+            return -1
+        else:
+            return 0
+    
+    def terminal_test(self):
+        return self.check_winner() is not None or all(x != "" for x in self.board)
+    
+    def minmax_decision(self):
+        def max_value(board, player):
+            winner = self.check_winner(board)
+            if winner is not None or "" not in board:
+                return self.utility(winner)
+            v = float('-inf')
+            for a in self.actions(board):
+                v = max(v, min_value(self.result(board, a, player), 'O' if player == 'X' else 'X'))
+            return v
+
+        def min_value(board, player):
+            winner = self.check_winner(board)
+            if winner is not None or "" not in board:
+                return self.utility(winner)
+            v = float('inf')
+            for a in self.actions(board):
+                v = min(v, max_value(self.result(board, a, player), 'O' if player == 'X' else 'X'))
+            return v
+
+        best_score = float('-inf')
+        best_action = None
+        for a in self.actions(self.board):
+            v = min_value(self.result(self.board, a, self.current_player), 'O' if self.current_player == 'X' else 'X')
+            if v > best_score:
+                best_score = v
+                best_action = a
+        return best_action
+
+
+    
 if __name__ == "__main__":
     window = Tk()
     ui = TicTacToeUI(window)
