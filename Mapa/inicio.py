@@ -6,8 +6,13 @@ import networkx as nx
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from pathlib import Path
+import networkx as nx
+# colores_disponibles = ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black', 'white', 'purple', 'orange', 'gray', 'brown']
+colores_disponibles = ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow']
 
-colores_disponibles = ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black', 'white', 'purple', 'orange', 'gray', 'brown']
+# Rangos de valores para los menús desplegables
+rango_regiones = list(range(16, 31))  # 16 a 30
+rango_colores = list(range(1, len(colores_disponibles) + 1))  # Desde 1 color hasta el máximo disponible
 
 def relative_to_assets(path: str) -> Path:
     current_folder = Path(__file__).parent
@@ -23,6 +28,15 @@ def visualizar_grafo(grafo, coloreo=None, frame_grafo=None):
         for vecino in vecinos:
             G.add_edge(nodo, vecino)
     pos = nx.spring_layout(G)
+    # pos = nx.circular_layout(G)
+    # pos = nx.kamada_kawai_layout(G)
+    # pos = nx.kamada_kawai_layout(G)
+    # pos = nx.kamada_kawai_layout(G)
+    # pos = nx.spring_layout(G, k=0.75, iterations=20)
+    # pos = nx.shell_layout(G)
+    # pos = nx.spectral_layout(G)
+    # pos = nx.kamada_kawai_layout(G)
+
     if coloreo:
         colores = [coloreo.get(nodo) for nodo in G.nodes()]
     else:
@@ -52,24 +66,47 @@ def colorear_grafo(grafo, num_colores):
     
     return coloreo
 
-def generar_grafo_aleatorio(num_regiones):
-    grafo = {str(i): set() for i in range(num_regiones)}
-    nodos = list(grafo.keys())
-    for nodo in nodos:
-        posible_conexion = nodo
-        while posible_conexion == nodo or posible_conexion in grafo[nodo]:
-            posible_conexion = random.choice(nodos)
-        grafo[nodo].add(posible_conexion)
-        grafo[posible_conexion].add(nodo)
-    for _ in range(int(num_regiones * 1.5)):
-        nodo = random.choice(nodos)
-        posible_conexion = random.choice(nodos)
-        if nodo != posible_conexion and posible_conexion not in grafo[nodo]:
-            grafo[nodo].add(posible_conexion)
-            grafo[posible_conexion].add(nodo)
+# def generar_grafo_aleatorio(num_regiones):
+#     grafo = {str(i): set() for i in range(num_regiones)}
+#     nodos = list(grafo.keys())
+#     for nodo in nodos:
+#         posible_conexion = nodo
+#         while posible_conexion == nodo or posible_conexion in grafo[nodo]:
+#             posible_conexion = random.choice(nodos)
+#         grafo[nodo].add(posible_conexion)
+#         grafo[posible_conexion].add(nodo)
+#     for _ in range(int(num_regiones * 1.5)):
+#         nodo = random.choice(nodos)
+#         posible_conexion = random.choice(nodos)
+#         if nodo != posible_conexion and posible_conexion not in grafo[nodo]:
+#             grafo[nodo].add(posible_conexion)
+#             grafo[posible_conexion].add(nodo)
     
-    return grafo
+#     return grafo
+def generar_grafo_aleatorio(num_regiones):
+    G = nx.Graph()
+    G.add_nodes_from(range(num_regiones))
+    
+    # Asegura un esqueleto básico conexo primero
+    for i in range(1, num_regiones):
+        G.add_edge(i - 1, i)
+    
+    # Intenta agregar más aristas de manera aleatoria sin perder la planaridad
+    nodos = list(G.nodes)
+    intentos = 0
+    max_intentos = num_regiones * 10  # Limita los intentos para evitar bucles infinitos
 
+    while G.number_of_edges() < num_regiones * 2 and intentos < max_intentos:
+        nodo_a, nodo_b = random.sample(nodos, 2)
+        if not G.has_edge(nodo_a, nodo_b):
+            G.add_edge(nodo_a, nodo_b)
+            if not nx.check_planarity(G)[0]:  # Revisa si el grafo sigue siendo plano
+                G.remove_edge(nodo_a, nodo_b)  # Remueve la arista si rompe la planaridad
+        intentos += 1
+
+    # Convertir el grafo NetworkX a un diccionario para compatibilidad
+    grafo = {str(nodo): set(str(neighbor) for neighbor in G.neighbors(nodo)) for nodo in G.nodes()}
+    return grafo
 def generar_grafo():
     try:
         num_regiones = int(entrada_regiones.get())
@@ -95,14 +132,19 @@ ventana.geometry("800x650")
 
 frame_entrada = ttk.Frame(ventana, padding="10")
 frame_entrada.pack(fill=tk.X)
+
 etiqueta_regiones = ttk.Label(frame_entrada, text="Número de Regiones (16-30):")
 etiqueta_regiones.pack(side=tk.LEFT)
-entrada_regiones = ttk.Entry(frame_entrada)
+entrada_regiones = ttk.Combobox(frame_entrada, values=rango_regiones)
 entrada_regiones.pack(side=tk.LEFT, padx=(0, 20))
+entrada_regiones.set(rango_regiones[0])  # Establecer el valor inicial al mínimo del rango
+
 etiqueta_colores = ttk.Label(frame_entrada, text="Número de Colores:")
 etiqueta_colores.pack(side=tk.LEFT)
-entrada_colores = ttk.Entry(frame_entrada)
+entrada_colores = ttk.Combobox(frame_entrada, values=rango_colores)
 entrada_colores.pack(side=tk.LEFT)
+entrada_colores.set(rango_colores[0])
+
 frame_grafo = ttk.Frame(ventana, padding="10")
 frame_grafo.pack(fill=tk.BOTH, expand=True)
 frame_acciones = ttk.Frame(ventana, padding="10")
