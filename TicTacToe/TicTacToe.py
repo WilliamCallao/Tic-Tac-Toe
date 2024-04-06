@@ -41,7 +41,7 @@ class TicTacToeUI:
         
         # Integrar la lógica del juego
         self.game_logic = GameLogic(self)
-        self.game_logic.player1_auto_play()
+        # self.game_logic.player1_auto_play()
     def relative_to_assets(self, path: str) -> Path:
         current_folder = Path(__file__).parent
         assets_folder = current_folder / Path("assets")
@@ -122,7 +122,7 @@ class TicTacToeUI:
 class GameLogic:
     def __init__(self, ui):
         self.ui = ui
-        self.current_player = "X"
+        self.current_player = "O"
         self.board = [""] * 9
 
     def actions(self, board):
@@ -162,6 +162,7 @@ class GameLogic:
                 self.ui.reset_game()
             else:
                 self.switch_player()
+                # Llama a player1_auto_play() solo si el jugador actual es el sistema (X)
                 if self.current_player == "X":
                     self.player1_auto_play()
                     
@@ -175,7 +176,7 @@ class GameLogic:
 
     def reset_game_logic(self):
         self.board = [""] * 9
-        self.current_player = "X"
+        self.current_player = "O"
 
     def result(self, board, action, player):
         new_board = board[:]
