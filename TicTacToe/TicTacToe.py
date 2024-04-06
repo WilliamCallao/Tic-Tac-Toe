@@ -88,7 +88,44 @@ class TicTacToeUI:
             677.0, 275.0, anchor="nw", text=str(self.player2_score), fill="#FFFFFF",
             font=("Inter ExtraBold", 46 * -1)
         )
-
+        self.game_canvas.create_text(
+            288.0,
+            39.0,
+            anchor="nw",
+            text="3   EN   RAYA",
+            fill="#000000",
+            font=("Inter ExtraBold", 36 * -1)
+        )
+        self.game_canvas.create_text(
+            37.0, 455.0,
+            anchor="nw",
+            text="IA - UMSS",
+            fill="#A4A4A4",
+            font=("Inter ExtraLight", 15 * -1)
+        )
+        self.game_canvas.create_text(
+            36.0, 491.0,
+            anchor="nw",
+            text="Fernandez Sandoval Camila Wara",
+            fill="#A4A4A4",
+            font=("Inter ExtraLight", 15 * -1)
+        )
+        self.game_canvas.create_text(
+            36.0, 473.0,
+            anchor="nw",
+            text="Callao Lopez William Humberto",
+            fill="#A4A4A4",
+            font=("Inter ExtraLight", 15 * -1)
+        )
+        self.game_canvas.create_text(
+            36.0,
+            509.0,
+            anchor="nw",
+            text="Vilela Montoya Maria Fernanda",
+            fill="#A4A4A4",
+            font=("Inter ExtraLight", 15 * -1)
+        )
+        
     def add_sidebar_buttons(self):
         restart_game_button = Button(
             self.main_window, image=self.restart_button_image, borderwidth=0,

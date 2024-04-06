@@ -45,10 +45,37 @@ canvas.create_text(
 )
 
 canvas.create_text(
-    20.0,
-    459.0,
+    37.0,
+    455.0,
     anchor="nw",
-    text="IA - UMSS Callao Lopez William Humberto Fernandez Sandoval Camila Wara Vilela Montoya Maria Fernanda",
+    text="IA - UMSS",
+    fill="#3D3D3D",
+    font=("Inter ExtraLight", 15 * -1)
+)
+
+canvas.create_text(
+    36.0,
+    491.0,
+    anchor="nw",
+    text="Fernandez Sandoval Camila Wara",
+    fill="#3D3D3D",
+    font=("Inter ExtraLight", 15 * -1)
+)
+
+canvas.create_text(
+    36.0,
+    473.0,
+    anchor="nw",
+    text="Callao Lopez William Humberto",
+    fill="#3D3D3D",
+    font=("Inter ExtraLight", 15 * -1)
+)
+
+canvas.create_text(
+    36.0,
+    509.0,
+    anchor="nw",
+    text="Vilela Montoya Maria Fernanda",
     fill="#3D3D3D",
     font=("Inter ExtraLight", 15 * -1)
 )
