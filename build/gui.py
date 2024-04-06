@@ -20,14 +20,14 @@ def relative_to_assets(path: str) -> Path:
 
 window = Tk()
 
-window.geometry("800x550")
+window.geometry("800x600")
 window.configure(bg = "#FFFFFF")
 
 
 canvas = Canvas(
     window,
-    bg = "#FFFFFF",
-    height = 550,
+    bg = "#F4F5FB",
+    height = 600,
     width = 800,
     bd = 0,
     highlightthickness = 0,
@@ -35,49 +35,20 @@ canvas = Canvas(
 )
 
 canvas.place(x = 0, y = 0)
-canvas.create_text(
-    288.0,
-    39.0,
-    anchor="nw",
-    text="3   EN   RAYA",
-    fill="#000000",
-    font=("Inter ExtraBold", 36 * -1)
+button_image_1 = PhotoImage(
+    file=relative_to_assets("button_1.png"))
+button_1 = Button(
+    image=button_image_1,
+    borderwidth=0,
+    highlightthickness=0,
+    command=lambda: print("button_1 clicked"),
+    relief="flat"
 )
-
-canvas.create_text(
-    37.0,
-    455.0,
-    anchor="nw",
-    text="IA - UMSS",
-    fill="#3D3D3D",
-    font=("Inter ExtraLight", 15 * -1)
-)
-
-canvas.create_text(
-    36.0,
-    491.0,
-    anchor="nw",
-    text="Fernandez Sandoval Camila Wara",
-    fill="#3D3D3D",
-    font=("Inter ExtraLight", 15 * -1)
-)
-
-canvas.create_text(
-    36.0,
-    473.0,
-    anchor="nw",
-    text="Callao Lopez William Humberto",
-    fill="#3D3D3D",
-    font=("Inter ExtraLight", 15 * -1)
-)
-
-canvas.create_text(
-    36.0,
-    509.0,
-    anchor="nw",
-    text="Vilela Montoya Maria Fernanda",
-    fill="#3D3D3D",
-    font=("Inter ExtraLight", 15 * -1)
+button_1.place(
+    x=304.0,
+    y=556.0,
+    width=193.0,
+    height=38.0
 )
 window.resizable(False, False)
 window.mainloop()
