@@ -1,6 +1,5 @@
-from tkinter import Tk, Canvas, Button, PhotoImage, Label, messagebox
+from tkinter import Tk, Canvas, Button, PhotoImage, Label
 from pathlib import Path
-import random
 
 class TicTacToeUI:
     def __init__(self, root):
@@ -8,6 +7,7 @@ class TicTacToeUI:
         self.main_window.geometry("800x550")
         self.main_window.configure(bg="black")
 
+        # Load images
         self.bg_image = PhotoImage(file=self.relative_to_assets("bg_image.png"))
         self.cross_image = PhotoImage(file=self.relative_to_assets("cross_image.png"))
         self.circle_image = PhotoImage(file=self.relative_to_assets("circle_image.png"))
@@ -19,6 +19,7 @@ class TicTacToeUI:
         self.player1_score = 0
         self.player2_score = 0
 
+        # Create game canvas
         self.game_canvas = Canvas(
             self.main_window,
             bg="black",
@@ -38,6 +39,7 @@ class TicTacToeUI:
         
         self.game_logic = GameLogic(self)
         # self.game_logic.player1_auto_play()
+
     def relative_to_assets(self, path: str) -> Path:
         current_folder = Path(__file__).parent
         assets_folder = current_folder / Path("assets")
@@ -60,55 +62,18 @@ class TicTacToeUI:
             self.game_buttons.append(game_button)
 
     def create_score_texts(self):
-        self.game_canvas.create_text(
-            60.0, 249.0, anchor="nw", text="PUNTAJE", fill="#FFFFFF",
-            font=("Inter ExtraBold", 19 * -1)
-        )
-        self.player1_score_text = self.game_canvas.create_text(
-            92.0, 275.0, anchor="nw", text=str(self.player1_score), fill="#FFFFFF",
-            font=("Inter ExtraBold", 46 * -1)
-        )
-        self.game_canvas.create_text(
-            70.0, 226.0, anchor="nw", text="Sistema", fill="#FFFFFF",
-            font=("Inter ExtraBold", 19 * -1)
-        )
-        self.game_canvas.create_text(
-            655.0, 226.0, anchor="nw", text="Jugador", fill="#FFFFFF",
-            font=("Inter ExtraBold", 19 * -1)
-        )
-        self.game_canvas.create_text(
-            650.0, 249.0, anchor="nw", text="PUNTAJE", fill="#FFFFFF",
-            font=("Inter ExtraBold", 19 * -1)
-        )
-        self.player2_score_text = self.game_canvas.create_text(
-            677.0, 275.0, anchor="nw", text=str(self.player2_score), fill="#FFFFFF",
-            font=("Inter ExtraBold", 46 * -1)
-        )
-        self.game_canvas.create_text(
-            288.0, 39.0, anchor="nw",
-            text="3   EN   RAYA",
-            fill="#000000", font=("Inter ExtraBold", 36 * -1)
-        )
-        self.game_canvas.create_text(
-            37.0, 455.0, anchor="nw",
-            text="IA - UMSS",
-            fill="#A4A4A4", font=("Inter ExtraLight", 15 * -1)
-        )
-        self.game_canvas.create_text(
-            36.0, 491.0, anchor="nw",
-            text="Fernandez Sandoval Camila Wara",
-            fill="#A4A4A4", font=("Inter ExtraLight", 15 * -1)
-        )
-        self.game_canvas.create_text(
-            36.0, 473.0, anchor="nw",
-            text="Callao Lopez William Humberto",
-            fill="#A4A4A4", font=("Inter ExtraLight", 15 * -1)
-        )
-        self.game_canvas.create_text(
-            36.0, 509.0, anchor="nw",
-            text="Vilela Montoya Maria Fernanda",
-            fill="#A4A4A4", font=("Inter ExtraLight", 15 * -1)
-        )
+        # Display text and scores
+        self.game_canvas.create_text(60.0, 249.0, anchor="nw", text="PUNTAJE", fill="#FFFFFF", font=("Inter ExtraBold", 19 * -1))
+        self.player1_score_text = self.game_canvas.create_text(92.0, 275.0, anchor="nw", text=str(self.player1_score), fill="#FFFFFF", font=("Inter ExtraBold", 46 * -1))
+        self.game_canvas.create_text(70.0, 226.0, anchor="nw", text="Sistema", fill="#FFFFFF", font=("Inter ExtraBold", 19 * -1))
+        self.game_canvas.create_text(655.0, 226.0, anchor="nw", text="Jugador", fill="#FFFFFF", font=("Inter ExtraBold", 19 * -1))
+        self.game_canvas.create_text(650.0, 249.0, anchor="nw", text="PUNTAJE", fill="#FFFFFF", font=("Inter ExtraBold", 19 * -1))
+        self.player2_score_text = self.game_canvas.create_text(677.0, 275.0, anchor="nw", text=str(self.player2_score), fill="#FFFFFF", font=("Inter ExtraBold", 46 * -1))
+        self.game_canvas.create_text(288.0, 39.0, anchor="nw", text="3   EN   RAYA", fill="#000000", font=("Inter ExtraBold", 36 * -1))
+        self.game_canvas.create_text(37.0, 455.0, anchor="nw", text="IA - UMSS", fill="#A4A4A4", font=("Inter ExtraLight", 15 * -1))
+        self.game_canvas.create_text(36.0, 491.0, anchor="nw", text="Fernandez Sandoval Camila Wara", fill="#A4A4A4", font=("Inter ExtraLight", 15 * -1))
+        self.game_canvas.create_text(36.0, 473.0, anchor="nw", text="Callao Lopez William Humberto", fill="#A4A4A4", font=("Inter ExtraLight", 15 * -1))
+        self.game_canvas.create_text(36.0, 509.0, anchor="nw", text="Vilela Montoya Maria Fernanda", fill="#A4A4A4", font=("Inter ExtraLight", 15 * -1))
 
     def add_sidebar_buttons(self):
         restart_game_button = Button(
@@ -117,16 +82,10 @@ class TicTacToeUI:
         )
         restart_game_button.place(x=304.0, y=465.0, width=193.0, height=38.0)
         
-        place_circle_image = Label(
-            self.main_window, image=self.circle_place_holder_image, borderwidth=0,
-            highlightthickness=0
-        )
+        place_circle_image = Label(self.main_window, image=self.circle_place_holder_image, borderwidth=0, highlightthickness=0)
         place_circle_image.place(x=83.0, y=133.0, width=50.0, height=50.0)
 
-        place_cross_image = Label(
-            self.main_window, image=self.cross_place_holder_image, borderwidth=0,
-            highlightthickness=0
-        )
+        place_cross_image = Label(self.main_window, image=self.cross_place_holder_image, borderwidth=0, highlightthickness=0)
         place_cross_image.place(x=668.0, y=133.0, width=50.0, height=50.0)
 
     def reset_game(self):
@@ -154,7 +113,7 @@ class GameLogic:
             action = self.minmax_decision()
             if action is not None:
                 self.button_click(action)      
-                      
+
     def switch_player(self):
         self.current_player = "O" if self.current_player == "X" else "X"
 
@@ -183,7 +142,7 @@ class GameLogic:
                 self.switch_player()
                 if self.current_player == "X":
                     self.player1_auto_play()
-                    
+
     def update_scores(self, winner):
         if winner == "X":
             self.ui.player1_score += 1
@@ -208,9 +167,6 @@ class GameLogic:
             return -1
         else:
             return 0
-    
-    def terminal_test(self):
-        return self.check_winner() is not None or all(x != "" for x in self.board)
     
     def minmax_decision(self):
         def max_value(board, player):
@@ -239,7 +195,7 @@ class GameLogic:
                 best_score = v
                 best_action = a
         return best_action
-   
+
 if __name__ == "__main__":
     window = Tk()
     ui = TicTacToeUI(window)
